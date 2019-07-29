@@ -3,5 +3,5 @@ bin/
 build/
 .classpath
 .project
-settings/
+.settings/
 .DS_Store
