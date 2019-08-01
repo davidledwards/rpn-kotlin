@@ -48,6 +48,139 @@ interface Parser : (Sequence<Token>) -> AST {
 
 private class BasicParser : Parser {
     override fun invoke(ins: Sequence<Token>): AST {
-        return SymbolAST("wow")
+        val (ast, rest) = p0(ins)
+        val t = rest.firstOrNull()
+        return when (t) {
+            is Token -> throw Exception("${t.lexeme}: expecting ${EOSToken.lexeme}")
+            else -> ast
+        }
+    }
+
+    /**
+     * p0 ::= <p2> <p1>
+     */
+    private fun p0(ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        val (l, rest) = p2(ins)
+        return p1(l, rest)
+    }
+
+    /**
+     * p1 ::= '+' <p2> <p1>
+     *    ::= '-' <p2> <p1>
+     *    ::= e
+     */
+    private tailrec fun p1(l: AST, ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        return when (ins.firstOrNull()) {
+            is PlusToken -> {
+                val (r, rest) = p2(ins.drop(1))
+                p1(AddAST(l, r), rest)
+            }
+            is MinusToken -> {
+                val (r, rest) = p2(ins.drop(1))
+                p1(SubtractAST(l, r), rest)
+            }
+            else ->
+                Pair(l, ins)
+        }
+    }
+
+    /**
+     * p2 ::= <p4> <p3>
+     */
+    private fun p2(ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        val (l, rest) = p4(ins)
+        return p3(l, rest)
+    }
+
+    /**
+     * p3 ::= '*' <p4> <p3>
+     *    ::= '/' <p4> <p3>
+     *    ::= '%' <p4> <p3>
+     *    ::= '^' <p4> <p3>
+     *    ::= e
+     */
+    private tailrec fun p3(l: AST, ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        return when (ins.firstOrNull()) {
+            is StarToken -> {
+                val (r, rest) = p4(ins.drop(1))
+                p3(MultiplyAST(l, r), rest)
+            }
+            is SlashToken -> {
+                val (r, rest) = p4(ins.drop(1))
+                p3(DivideAST(l, r), rest)
+            }
+            is PercentToken -> {
+                val (r, rest) = p4(ins.drop(1))
+                p3(ModuloAST(l, r), rest)
+            }
+            is CaretToken -> {
+                val (r, rest) = p4(ins.drop(1))
+                p3(PowerAST(l, r), rest)
+            }
+            else ->
+                Pair(l, ins)
+        }
+    }
+
+    /**
+     * p4 ::= <p6> <p5>
+     */
+    private fun p4(ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        val (l, rest) = p6(ins)
+        return p5(l, rest)
+    }
+
+    /**
+     * p5 ::= 'min' <p6> <p5>
+     *    ::= 'max' <p6> <p5>
+     *    ::= e
+     */
+    private tailrec fun p5(l: AST, ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        return when (ins.firstOrNull()) {
+            is MinToken -> {
+                val (r, rest) = p6(ins.drop(1))
+                p5(MinAST(l, r), rest)
+            }
+            is MaxToken -> {
+                val (r, rest) = p6(ins.drop(1))
+                p5(MaxAST(l, r), rest)
+            }
+            else ->
+                Pair(l, ins)
+        }
+    }
+
+    /**
+     * p6 ::= '(' <p0> ')'
+     *    ::= <symbol>
+     *    ::= <number>
+     */
+    private fun p6(ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
+        val t = ins.firstOrNull()
+        return when (t) {
+            is LeftParenToken -> {
+                val (ast, rest) = p0(ins.drop(1))
+                Pair(ast, confirm(rest, RightParenToken))
+            }
+            is SymbolToken ->
+                Pair(SymbolAST(t.lexeme), ins.drop(1))
+            is NumberToken ->
+                Pair(NumberAST(t.lexeme.toDouble()), ins.drop(1))
+            else -> {
+                val lexeme = (t ?: EOSToken).lexeme
+                throw Exception("$lexeme: expecting '(', <symbol> or <number>")
+            }
+        }
+    }
+
+    private fun confirm(ins: Sequence<Token>, token: Token): Sequence<Token> {
+        val t = ins.firstOrNull()
+        return when (t) {
+            is Token, token -> ins.drop(1)
+            else -> {
+                val lexeme = (t ?: EOSToken).lexeme
+                throw Exception("$lexeme: expecting '${token.lexeme}'")
+            }
+        }
     }
 }
