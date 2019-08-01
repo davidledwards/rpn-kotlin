@@ -12,6 +12,7 @@ fun main(args: Array<String>) {
 object Compiler {
     fun main(args: Array<String>) = try {
         val arg = args.firstOrNull()
+        val ins = InputSequence(System.`in`)
         when (arg) {
             "-?" -> {
                 println("usage: rpnc [options]")
@@ -21,7 +22,6 @@ object Compiler {
                 println("  -o  optimize")
             }
             "-t" -> {
-                val ins = InputSequence(System.`in`)
                 val tokens = Lexer.create(ins)
                 tokens.forEach { println(it) }
             }
@@ -45,9 +45,13 @@ object Compiler {
 private class InputSequence(ins: InputStream) : Sequence<Char> {
     private val reader = BufferedReader(InputStreamReader(ins, "UTF-8"))
     private val acc = StringBuilder()
-    private var c = reader.read()
+    private var c: Int? = null
 
     override operator fun iterator() = object : Iterator<Char> {
+        init {
+            if (c == null) c = reader.read()
+        }
+
         val iter = acc.iterator()
 
         override operator fun hasNext(): Boolean {
@@ -58,7 +62,7 @@ private class InputSequence(ins: InputStream) : Sequence<Char> {
             return if (iter.hasNext())
                 iter.next()
             else {
-                acc.append(c.toChar())
+                acc.append(c!!.toChar())
                 c = reader.read()
                 iter.next()
             }
