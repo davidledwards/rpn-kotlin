@@ -35,39 +35,44 @@ package com.loopfor.rpn
  * EOS = <end of stream>
  * }}}
  */
-sealed class Token(val type: String, val lexeme: String) {
-    override fun toString(): String = "$type($lexeme)"
+sealed class Token(val lexeme: String) {
+    override fun toString(): String = "Token($lexeme)"
 }
 
-object PlusToken : Token("PlusToken", "+")
-object MinusToken : Token("MinusToken", "-")
-object StarToken : Token("StarToken", "*")
-object SlashToken : Token("SlashToken", "/")
-object PercentToken : Token("PercentToken", "%")
-object CaretToken : Token("CaretToken", "^")
-object LeftParenToken : Token("LeftParenToken", "(")
-object RightParenToken : Token("RightParenToken", ")")
-object MinToken : Token("MinToken", "min")
-object MaxToken : Token("MaxToken", "max")
+class PlusToken : Token("+")
+class MinusToken : Token("-")
+class StarToken : Token("*")
+class SlashToken : Token("/")
+class PercentToken : Token("%")
+class CaretToken : Token("^")
+class LeftParenToken : Token("(")
+class RightParenToken : Token(")")
+class MinToken : Token("min")
+class MaxToken : Token("max")
+class SymbolToken(lexeme: String) : Token(lexeme)
+class NumberToken(lexeme: String) : Token(lexeme)
+class EOSToken : Token("<EOS>")
 
-class SymbolToken(lexeme: String) : Token("SymbolToken", lexeme)
-class NumberToken(lexeme: String) : Token("NumberToken", lexeme)
+object Tokens {
+    val EOS = EOSToken()
 
-object EOSToken : Token("EOSToken", "<EOS>")
+    val reserved: Map<String, Token> = listOf(
+        PlusToken(),
+        MinusToken(),
+        StarToken(),
+        SlashToken(),
+        PercentToken(),
+        CaretToken(),
+        LeftParenToken(),
+        RightParenToken(),
+        MinToken(),
+        MaxToken()
+    ).map { it.lexeme to it }.toMap()
 
-val SIMPLE_TOKENS: Map<Char, Token> = mapOf(
-    PlusToken.lexeme[0] to PlusToken,
-    MinusToken.lexeme[0] to MinusToken,
-    StarToken.lexeme[0] to StarToken,
-    SlashToken.lexeme[0] to SlashToken,
-    PercentToken.lexeme[0] to PercentToken,
-    CaretToken.lexeme[0] to CaretToken,
-    LeftParenToken.lexeme[0] to LeftParenToken,
-    RightParenToken.lexeme[0] to RightParenToken
-)
+    val simple: Map<Char, Token> =
+        reserved.filter { (k, _) -> k.length == 1 }.mapKeys { (k, _) -> k[0] }
 
-val SYMBOL_TOKENS: Map<String, Token> = mapOf(
-    CaretToken.lexeme to CaretToken,
-    MinToken.lexeme to MinToken,
-    MaxToken.lexeme to MaxToken
-)
+    val symbols: Map<String, Token> = listOf(
+        "^", "min", "max"
+    ).map { it to reserved.getValue(it) }.toMap()
+}

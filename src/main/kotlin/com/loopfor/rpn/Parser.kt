@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 David Edwards
+ * Copyright 2019 David Edwards
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ private class BasicParser : Parser {
         val (ast, rest) = p0(ins)
         val t = rest.firstOrNull()
         return when (t) {
-            is Token -> throw Exception("${t.lexeme}: expecting ${EOSToken.lexeme}")
+            is Token -> throw Exception("${t.lexeme}: expecting ${Tokens.EOS.lexeme}")
             else -> ast
         }
     }
@@ -160,14 +160,14 @@ private class BasicParser : Parser {
         return when (t) {
             is LeftParenToken -> {
                 val (ast, rest) = p0(ins.drop(1))
-                Pair(ast, confirm(rest, RightParenToken))
+                Pair(ast, confirm(rest, RightParenToken()))
             }
             is SymbolToken ->
                 Pair(SymbolAST(t.lexeme), ins.drop(1))
             is NumberToken ->
                 Pair(NumberAST(t.lexeme.toDouble()), ins.drop(1))
             else -> {
-                val lexeme = (t ?: EOSToken).lexeme
+                val lexeme = (t ?: Tokens.EOS).lexeme
                 throw Exception("$lexeme: expecting '(', <symbol> or <number>")
             }
         }
@@ -178,7 +178,7 @@ private class BasicParser : Parser {
         return when (t) {
             is Token, token -> ins.drop(1)
             else -> {
-                val lexeme = (t ?: EOSToken).lexeme
+                val lexeme = (t ?: Tokens.EOS).lexeme
                 throw Exception("$lexeme: expecting '${token.lexeme}'")
             }
         }

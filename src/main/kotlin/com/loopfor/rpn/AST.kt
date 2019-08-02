@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 David Edwards
+ * Copyright 2019 David Edwards
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package com.loopfor.rpn
 
+/**
+ * Represents a syntax tree constructed by parsing a stream of tokens.
+ */
 sealed class AST
 
 data class SymbolAST(val name: String): AST()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 David Edwards
+ * Copyright 2019 David Edwards
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.loopfor.rpn
+package com.loopfor.rpn
 
 import java.io.BufferedReader
 import java.io.InputStream

@@ -1,5 +1,26 @@
+/*
+ * Copyright 2019 David Edwards
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.loopfor.rpn
 
+/**
+ * A lexical analyzer that transforms a stream of characters into a stream of tokens.
+ * 
+ * Tokens must either be delimited by one or more whitespace characters, or be clearly
+ * distinguishable from each other if not separated by whitespace.
+ */
 interface Lexer : (Sequence<Char>) -> Sequence<Token> {
     companion object {
         fun create(): Lexer = BasicLexer()
@@ -10,12 +31,12 @@ interface Lexer : (Sequence<Char>) -> Sequence<Token> {
 
 private class BasicLexer : Lexer {
     override fun invoke(ins: Sequence<Char>): Sequence<Token> {
-        tailrec fun tokens(ins: Sequence<Char>): Sequence<Token> {
+        fun tokens(ins: Sequence<Char>): Sequence<Token> {
             val (token, _ins) = tokenize(ins)
-            return if (token == EOSToken)
-                emptySequence<Token>()
-            else
-                sequenceOf<Token>(token) + tokens(_ins)
+            return when (token) {
+                Tokens.EOS -> emptySequence<Token>()
+                else -> sequenceOf<Token>(token) + tokens(_ins)
+            }
         }
         return tokens(ins)
     }
@@ -25,14 +46,14 @@ private class BasicLexer : Lexer {
         return when (c) {
             in WHITESPACE ->
                 tokenize(ins.drop(1))
-            in SIMPLE_TOKENS ->
-                SIMPLE_TOKENS.get(c)!! to ins.drop(1)
+            in Tokens.simple ->
+                Pair(Tokens.simple.getValue(c!!), ins.drop(1))
             in DIGITS ->
                 readNumber(ins.drop(1), "$c")
             in LETTERS ->
                 readSymbol(ins.drop(1), "$c")
             null ->
-                EOSToken to ins
+                Pair(Tokens.EOS, ins)
             else ->
                 throw Exception("$c: unrecognized character")
         }
@@ -52,7 +73,7 @@ private class BasicLexer : Lexer {
                 if (lexeme.last() == '.')
                     throw Exception("$lexeme: malformed number")
                 else
-                    NumberToken(lexeme) to ins
+                    Pair(NumberToken(lexeme), ins)
         }
     }
 
@@ -61,7 +82,7 @@ private class BasicLexer : Lexer {
         return if (c in LETTERS)
             readSymbol(ins.drop(1), lexeme + c)
         else
-            (SYMBOL_TOKENS.get(lexeme) ?: SymbolToken(lexeme)) to ins
+            Pair(Tokens.symbols.get(lexeme) ?: SymbolToken(lexeme), ins)
     }
 
     private val DIGITS = ('0'..'9').toSet()
