@@ -15,6 +15,11 @@
  */
 package com.loopfor.rpn
 
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.reflect.KClass
+
 /**
  * An evaluator that computes the result of an instruction sequence.
  */
@@ -24,6 +29,17 @@ interface Evaluator : (Sequence<Code>) -> Double {
         fun create(codes: Sequence<Code>, resolver: (String) -> Double?): Double = create(resolver)(codes)
     }
 }
+
+private val operators: Map<KClass<out OperatorCode>, (Double, Double) -> Double> = mapOf(
+    AddCode::class to { l, r -> l + r },
+    SubtractCode::class to { l, r -> l - r },
+    MultiplyCode::class to { l, r -> l * r },
+    DivideCode::class to { l, r -> l / r },
+    MinCode::class to { l, r -> min(l, r) },
+    MaxCode::class to { l, r -> max(l, r) },
+    ModuloCode::class to { l, r -> l % r },
+    PowerCode::class to { base, exp -> base.pow(exp) }
+)
 
 private class BasicEvaluator(val resolver: (String) -> Double?) : Evaluator {
     override fun invoke(codes: Sequence<Code>): Double {
