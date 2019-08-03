@@ -48,7 +48,8 @@ object Compiler {
                 println("TODO")
             }
             null -> {
-                println("TODO")
+                val lines = Emitter.create(Generator.create(Parser.create(Lexer.create(ins))))
+                lines.forEach { println(it) }
             }
             else ->
                 println("$arg: unrecognized option")

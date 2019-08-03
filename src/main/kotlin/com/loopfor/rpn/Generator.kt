@@ -27,10 +27,61 @@ interface Generator : (AST) -> List<Code> {
     }
 }
 
+// Represents sequence of instruction codes and symbol names.
+private typealias State = Pair<List<Code>, Set<String>>
+
 private class BasicGenerator : Generator {
     override fun invoke(ast: AST): List<Code> = generate(ast)
 
     private fun generate(ast: AST): List<Code> {
-        return emptyList()
+        fun generate(ast: AST, state: State): State = when (ast) {
+            is SymbolAST -> {
+                val (codes, syms) = state
+                Pair(codes + PushSymbolCode(ast.name), syms + ast.name)
+            }
+            is NumberAST -> {
+                val (codes, syms) = state
+                Pair(codes + PushCode(ast.value), syms)
+            }
+            is AddAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + AddCode(2), syms)
+            }
+            is SubtractAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + SubtractCode(2), syms)
+            }
+            is MultiplyAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + MultiplyCode(2), syms)
+            }
+            is DivideAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + DivideCode(2), syms)
+            }
+            is MinAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + MinCode(2), syms)
+            }
+            is MaxAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + MaxCode(2), syms)
+            }
+            is ModuloAST -> {
+                val (codes, syms) = generate(ast.r, generate(ast.l, state))
+                Pair(codes + ModuloCode(), syms)
+            }
+            is PowerAST -> {
+                val (codes, syms) = generate(ast.exp, generate(ast.base, state))
+                Pair(codes + PowerCode(), syms)
+            }
+        }
+
+        // Instruction codes are generated and set of referenced symbols is gathered during traversal.
+        val (codes, syms) = generate(ast, Pair(emptyList(), emptySet()))
+
+        // Map set of symbol names to declarations and prepend to instruction codes.
+        val decls = syms.toList().sorted().map { DeclareSymbolCode(it) }
+        return decls + codes
     }
 }
