@@ -45,7 +45,8 @@ object Compiler {
                 println(ast.format())
             }
             "-o" -> {
-                println("TODO")
+                val lines = Emitter.create(Optimizer.create(Generator.create(Parser.create(Lexer.create(ins)))))
+                lines.forEach { println(it) }
             }
             null -> {
                 val lines = Emitter.create(Generator.create(Parser.create(Lexer.create(ins))))
