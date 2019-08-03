@@ -58,7 +58,7 @@ abstract class DynamicOperatorCode(op: String, args: Int) : OperatorCode(op, arg
 /**
  * Declares a symbol before its use, which allows the interpreter to bind a value.
  */
-class DeclareSymbolCode(name: String) : Code("sym") {
+class DeclareSymbolCode(val name: String) : Code("sym") {
     override val repr = "$op $name"
 
     companion object {
