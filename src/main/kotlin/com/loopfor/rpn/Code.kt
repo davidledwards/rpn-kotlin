@@ -295,6 +295,10 @@ private fun <T : Code> verify(args: String, lower: Int, fn: (Int) -> T): T? {
 }
 
 object Codes {
+    fun symbols(codes: Sequence<Code>): Sequence<String> {
+        return codes.flatMap { if (it is DeclareSymbolCode) sequenceOf(it.name) else emptySequence() }
+    }
+
     fun parse(repr: String): Code? {
         return DeclareSymbolCode.match(repr)
             ?: PushSymbolCode.match(repr)
