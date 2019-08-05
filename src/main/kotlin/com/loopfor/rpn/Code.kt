@@ -93,10 +93,10 @@ class PushSymbolCode(val name: String) : Code("pushsym") {
  * Pushes the number `value` onto the evaluation stack.
  */
 class PushCode(val value: Double) : Code("push") {
-    override val repr: String get() {
-        val v = String.format("%.10f", value).reversed().dropWhile { it == '0'}.dropWhile { it == '.'}.reversed()
-        return "$op $v"
-    }
+    private val canonical =
+        String.format("%.10f", value).reversed().dropWhile { it == '0' }.dropWhile { it == '.' }.reversed()
+
+    override val repr = "$op $canonical"
 
     companion object {
         private val pattern = """\s*push\s+(-?\d+|-?\d+\.\d+)\s*""".toRegex()
