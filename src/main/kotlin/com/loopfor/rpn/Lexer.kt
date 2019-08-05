@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * A lexical analyzer that transforms a stream of characters into a stream of tokens.
+ * A lexical analyzer that transforms a sequence of characters into a sequence of tokens.
  * 
  * Tokens must either be delimited by one or more whitespace characters, or be clearly
  * distinguishable from each other if not separated by whitespace.
@@ -42,8 +42,7 @@ private class BasicLexer : Lexer {
     }
 
     private tailrec fun tokenize(ins: Sequence<Char>): Pair<Token, Sequence<Char>> {
-        val c = ins.firstOrNull()
-        return when (c) {
+        return when (val c = ins.firstOrNull()) {
             in WHITESPACE ->
                 tokenize(ins.drop(1))
             in Tokens.simple ->
@@ -60,8 +59,7 @@ private class BasicLexer : Lexer {
     }
 
     private tailrec fun readNumber(ins: Sequence<Char>, lexeme: String): Pair<Token, Sequence<Char>> {
-        val c = ins.firstOrNull()
-        return when (c) {
+        return when (val c = ins.firstOrNull()) {
             '.' ->
                 if (c in lexeme)
                     throw Exception("$lexeme: malformed number")
@@ -78,11 +76,12 @@ private class BasicLexer : Lexer {
     }
 
     private tailrec fun readSymbol(ins: Sequence<Char>, lexeme: String): Pair<Token, Sequence<Char>> {
-        val c = ins.firstOrNull()
-        return if (c in LETTERS)
-            readSymbol(ins.drop(1), lexeme + c)
-        else
-            Pair(Tokens.symbols.get(lexeme) ?: SymbolToken(lexeme), ins)
+        return when (val c = ins.firstOrNull()) {
+            in LETTERS ->
+                readSymbol(ins.drop(1), lexeme + c)
+            else ->
+                Pair(Tokens.symbols.get(lexeme) ?: SymbolToken(lexeme), ins)
+        }
     }
 
     private val DIGITS = ('0'..'9').toSet()

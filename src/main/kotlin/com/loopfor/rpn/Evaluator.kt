@@ -33,8 +33,7 @@ interface Evaluator : (Sequence<Code>) -> Double {
 private class BasicEvaluator(val resolver: (String) -> Double?) : Evaluator {
     override fun invoke(codes: Sequence<Code>): Double {
         fun evaluate(codes: Sequence<Code>, stack: List<Double>, syms: Map<String, Double>): Double {
-            val c = codes.firstOrNull()
-            return when (c) {
+            return when (val c = codes.firstOrNull()) {
                 is DeclareSymbolCode -> {
                     resolver(c.name)?.let {
                         evaluate(codes.drop(1), stack, syms + Pair(c.name, it))

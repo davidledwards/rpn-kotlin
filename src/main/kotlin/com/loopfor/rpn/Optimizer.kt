@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * An optimizer that transforms a sequence of instructions into another sequence of
+ * An optimizer that transforms a list of instructions into another list of
  * instructions.
  */
 interface Optimizer : (List<Code>) -> List<Code> {

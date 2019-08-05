@@ -16,7 +16,7 @@
  package com.loopfor.rpn
 
  /**
- * A recursive-descent parser that transforms a stream of tokens into a syntax tree.
+ * A recursive-descent parser that transforms a sequence of tokens into a syntax tree.
  * 
  * Grammar:
  * {{{
@@ -49,8 +49,7 @@ interface Parser : (Sequence<Token>) -> AST {
 private class BasicParser : Parser {
     override fun invoke(ins: Sequence<Token>): AST {
         val (ast, rest) = p0(ins)
-        val t = rest.firstOrNull()
-        return when (t) {
+        return when (val t = rest.firstOrNull()) {
             is Token -> throw Exception("${t.lexeme}: expecting ${Tokens.EOS.lexeme}")
             else -> ast
         }
@@ -156,8 +155,7 @@ private class BasicParser : Parser {
      *    ::= <number>
      */
     private fun p6(ins: Sequence<Token>): Pair<AST, Sequence<Token>> {
-        val t = ins.firstOrNull()
-        return when (t) {
+        return when (val t = ins.firstOrNull()) {
             is LeftParenToken -> {
                 val (ast, rest) = p0(ins.drop(1))
                 Pair(ast, confirm(rest, RightParenToken()))
@@ -174,8 +172,7 @@ private class BasicParser : Parser {
     }
 
     private fun confirm(ins: Sequence<Token>, token: Token): Sequence<Token> {
-        val t = ins.firstOrNull()
-        return when (t) {
+        return when (val t = ins.firstOrNull()) {
             is Token, token -> ins.drop(1)
             else -> {
                 val lexeme = (t ?: Tokens.EOS).lexeme

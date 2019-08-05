@@ -21,9 +21,8 @@ fun main(args: Array<String>) {
 
 object Compiler {
     fun main(args: Array<String>) = try {
-        val arg = args.firstOrNull()
         val ins = InputSequence(System.`in`)
-        when (arg) {
+        when (val arg = args.firstOrNull()) {
             "-?" -> {
                 println("usage: rpnc [options]")
                 println("  Compile expression from stdin and emit instructions to stdout.")

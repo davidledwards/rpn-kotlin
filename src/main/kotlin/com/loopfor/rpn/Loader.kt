@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * An instruction loader that transforms a stream of characters into a stream of
+ * An instruction loader that transforms a sequence of characters into a sequence of
  * instructions.
  */
 interface Loader : (Sequence<Char>) -> Sequence<Code> {
@@ -42,8 +42,7 @@ private class BasicLoader : Loader {
 
     private fun read(ins: Sequence<Char>): Pair<String?, Sequence<Char>> {
         tailrec fun slurp(ins: Sequence<Char>, repr: String): Pair<String?, Sequence<Char>> {
-            val c = ins.firstOrNull()
-            return when (c) {
+            return when (val c = ins.firstOrNull()) {
                 '\n' -> Pair(repr, ins.drop(1))
                 null -> Pair(if (repr.length == 0) null else repr, ins)
                 else -> slurp(ins.drop(1), repr + c)

@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * Represents a syntax tree constructed by parsing a stream of tokens.
+ * Represents a syntax tree constructed by parsing a sequence of tokens.
  */
 sealed class AST
 

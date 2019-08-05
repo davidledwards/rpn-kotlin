@@ -62,7 +62,7 @@ class DeclareSymbolCode(val name: String) : Code("sym") {
     override val repr = "$op $name"
 
     companion object {
-        val pattern = """\s*sym\s+([a-zA-Z]+)\s*""".toRegex()
+        private val pattern = """\s*sym\s+([a-zA-Z]+)\s*""".toRegex()
 
         fun match(repr: String): DeclareSymbolCode? =
             pattern.matchEntire(repr)?.let {
@@ -79,7 +79,7 @@ class PushSymbolCode(val name: String) : Code("pushsym") {
     override val repr = "$op $name"
 
     companion object {
-        val pattern = """\s*pushsym\s+([a-zA-Z]+)\s*""".toRegex()
+        private val pattern = """\s*pushsym\s+([a-zA-Z]+)\s*""".toRegex()
 
         fun match(repr: String): PushSymbolCode? =
             pattern.matchEntire(repr)?.let {
@@ -99,7 +99,7 @@ class PushCode(val value: Double) : Code("push") {
     }
 
     companion object {
-        val pattern = """\s*push\s+(-?\d+|-?\d+\.\d+)\s*""".toRegex()
+        private val pattern = """\s*push\s+(-?\d+|-?\d+\.\d+)\s*""".toRegex()
 
         fun match(repr: String): PushCode? =
             pattern.matchEntire(repr)?.let {
@@ -122,7 +122,7 @@ class AddCode(args: Int) : DynamicOperatorCode("add", args) {
     override val isCommutative = true
 
     companion object {
-        val pattern = """\s*add\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*add\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): AddCode? =
             pattern.matchEntire(repr)?.let {
@@ -141,7 +141,7 @@ class SubtractCode(args: Int) : DynamicOperatorCode("sub", args) {
     override val isCommutative = false
 
     companion object {
-        val pattern = """\s*sub\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*sub\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): SubtractCode? =
             pattern.matchEntire(repr)?.let {
@@ -160,7 +160,7 @@ class MultiplyCode(args: Int) : DynamicOperatorCode("mul", args) {
     override val isCommutative = true
 
     companion object {
-        val pattern = """\s*mul\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*mul\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): MultiplyCode? =
             pattern.matchEntire(repr)?.let {
@@ -179,7 +179,7 @@ class DivideCode(args: Int) : DynamicOperatorCode("div", args) {
     override val isCommutative = false
 
     companion object {
-        val pattern = """\s*div\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*div\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): DivideCode? =
             pattern.matchEntire(repr)?.let {
@@ -198,7 +198,7 @@ class MinCode(args: Int) : DynamicOperatorCode("min", args) {
     override val isCommutative = true
 
     companion object {
-        val pattern = """\s*min\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*min\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): MinCode? =
             pattern.matchEntire(repr)?.let {
@@ -217,7 +217,7 @@ class MaxCode(args: Int) : DynamicOperatorCode("max", args) {
     override val isCommutative = true
 
     companion object {
-        val pattern = """\s*max\s+(\d+)\s*""".toRegex()
+        private val pattern = """\s*max\s+(\d+)\s*""".toRegex()
 
         fun match(repr: String): MaxCode? =
             pattern.matchEntire(repr)?.let {
@@ -236,7 +236,7 @@ class ModuloCode : FixedOperatorCode("mod", 2) {
     override val isCommutative = false
 
     companion object {
-        val pattern = """\s*mod\s*""".toRegex()
+        private val pattern = """\s*mod\s*""".toRegex()
 
         fun match(repr: String): ModuloCode? =
             pattern.matchEntire(repr)?.let { ModuloCode() }
@@ -252,7 +252,7 @@ class PowerCode : FixedOperatorCode("pow", 2) {
     override val isCommutative = false
 
     companion object {
-        val pattern = """\s*pow\s*""".toRegex()
+        private val pattern = """\s*pow\s*""".toRegex()
 
         fun match(repr: String): PowerCode? =
             pattern.matchEntire(repr)?.let { PowerCode() }
@@ -264,7 +264,7 @@ class PowerCode : FixedOperatorCode("pow", 2) {
  */
 class NopCode : BasicCode("nop") {
     companion object {
-        val pattern = """\s*nop\s*""".toRegex()
+        private val pattern = """\s*nop\s*""".toRegex()
 
         fun match(repr: String): NopCode? =
             pattern.matchEntire(repr)?.let { NopCode() }
@@ -296,7 +296,9 @@ private fun <T : Code> verify(args: String, lower: Int, fn: (Int) -> T): T? {
 
 object Codes {
     fun symbols(codes: Sequence<Code>): Sequence<String> {
-        return codes.flatMap { if (it is DeclareSymbolCode) sequenceOf(it.name) else emptySequence() }
+        return codes.flatMap { c ->
+            if (c is DeclareSymbolCode) sequenceOf(c.name) else emptySequence()
+        }
     }
 
     fun parse(repr: String): Code? {

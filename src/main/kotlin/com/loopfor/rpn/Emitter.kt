@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * An emitter that transforms a sequence of instructions into a stream of strings.
+ * An emitter that transforms a list of instructions into a sequence of strings.
  */
 interface Emitter : (List<Code>) -> Sequence<String> {
     companion object {

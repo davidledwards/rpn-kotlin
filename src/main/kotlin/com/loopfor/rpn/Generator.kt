@@ -16,7 +16,7 @@
 package com.loopfor.rpn
 
 /**
- * A code generator that transforms a syntax tree to a sequence of instructions.
+ * A code generator that transforms a syntax tree to a list of instructions.
  * 
  * The instruction sequence should be considered unoptimized.
  */
@@ -27,7 +27,7 @@ interface Generator : (AST) -> List<Code> {
     }
 }
 
-// Represents sequence of instruction codes and symbol names.
+// Represents list of instruction codes and symbol names.
 private typealias State = Pair<List<Code>, Set<String>>
 
 private class BasicGenerator : Generator {
