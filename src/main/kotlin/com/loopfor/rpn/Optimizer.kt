@@ -34,4 +34,20 @@ private class BasicOptimizer : Optimizer {
     override fun invoke(codes: List<Code>): List<Code> {
         return codes
     }
+
+    private fun revise(codes: List<Code>, revs: Map<Int, Code>): List<Code> {
+        return if (revs.isEmpty())
+            codes
+        else {
+            val (_, cs) = codes.fold(Pair(0, emptyList<Code>())) {
+                (pos, revised), code ->
+                    Pair(pos + 1, when (val c = revs.get(pos)) {
+                        is NopCode -> revised
+                        null -> revised + code
+                        else -> revised + c
+                    })
+            }
+            cs
+        }
+    }
 }
