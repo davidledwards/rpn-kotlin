@@ -219,8 +219,29 @@ private class BasicOptimizer : Optimizer {
      * modified to reflect the combined number of arguments.
      */
     private fun flattenDynamicOperators(codes: List<Code>): List<Code> {
-        // TODO
-        return codes
+        val initial: Triple<Int, DynamicOperatorCode?, Map<Int, Code>> = Triple(0, null, emptyMap())
+        val (_, _, revs) = codes.fold(initial) {
+            (pos, prior, revs), code ->
+                val (p, r) = when {
+                    code is DynamicOperatorCode && code.isAssociative -> when (prior?.op) {
+                        code.op -> {
+                            // Current instruction matches previous instruction, so do the following:
+                            // - replace last instruction with `nop`, which may overwrite revision from
+                            //   prior instruction evaluation
+                            // - modify current instruction to reflect combined argument count
+                            val _code: DynamicOperatorCode = code
+                            val rep = dynamicCtors.getValue(_code::class)(_code.args + prior.args - 1)
+                            Pair(rep, revs + ((pos - 1) to NopCode()) + (pos to rep))
+                        }
+                        else ->
+                            Pair(code, revs)
+                    }
+                    else ->
+                        Pair(null, revs)
+                }
+                Triple(pos + 1, p, r)
+        }
+        return revise(codes, revs)
     }
 
     /**
