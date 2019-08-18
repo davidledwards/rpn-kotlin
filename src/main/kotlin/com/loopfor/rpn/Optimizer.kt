@@ -15,6 +15,8 @@
  */
 package com.loopfor.rpn
 
+import kotlin.reflect.KClass
+
 /**
  * An optimizer that transforms a list of instructions into another list of
  * instructions.
@@ -44,6 +46,20 @@ private class BasicOptimizer : Optimizer {
         ::flattenDynamicOperators,
         ::evaluateLiteralExpressions
     )
+
+    private val dynamicCtors: Map<KClass<out DynamicOperatorCode>, (Int) -> DynamicOperatorCode> = mapOf(
+        AddCode::class to ::AddCode,
+        SubtractCode::class to ::SubtractCode,
+        MultiplyCode::class to ::MultiplyCode,
+        DivideCode::class to ::DivideCode,
+        MinCode::class to ::MinCode,
+        MaxCode::class to ::MaxCode
+    )
+
+    private val operatorCtors: Map<KClass<out Code>, (Int) -> Code> = mapOf<KClass<out Code>, (Int) -> Code>(
+        ModuloCode::class to { _ -> ModuloCode() },
+        PowerCode::class to { _ -> PowerCode() }
+    ) + dynamicCtors
 
     /**
      * An optimization that combines a series of identical operations as they appear in the
@@ -98,9 +114,54 @@ private class BasicOptimizer : Optimizer {
      * a new sequence of instructions.
      */
     private fun combineDynamicOperators(codes: List<Code>): List<Code> {
-        // TODO
-        return codes
+        val (_, _, revs) = codes.fold(Triple(0, emptyList<Frame>(), emptyMap<Int, Code>())) {
+            (pos, frames, revs), code ->
+                val (_frames, _revs) = when (code) {
+                    is PushSymbolCode, is PushCode -> {
+                        // Such codes are not eligible for optimization.
+                        Pair(IneligibleFrame() + frames, revs)
+                    }
+                    is DynamicOperatorCode -> {
+                        // Consider only last argument on stack frame as potentially eligible, and only
+                        // if operator names match. The intuition behind examining only the last argument,
+                        // which is actually the first when viewed from a left-to-right evaluation
+                        // standpoint, is that the prior eligible operator would have occurred at the
+                        // same frame depth as the current operator.
+                        val (_code, _revs) = let {
+                            val frame = frames.take(code.args).lastOrNull()
+                            when {
+                                frame is EligibleFrame && frame.op == code.op -> {
+                                    // Create modified instruction to reflect increase in number of arguments,
+                                    // and turn eligible instruction into `nop` by including in revision set.
+                                    val _code: DynamicOperatorCode = code
+                                    val _c = dynamicCtors.getValue(_code::class)(_code.args + frame.code.args - 1)
+                                    Pair(_c, revs + (frame.pos to NopCode()) + (pos to _c))
+                                }
+                                else ->
+                                    Pair(code, revs)
+                            }
+                        }
+                        Pair(EligibleFrame(_code.op, pos, _code) + frames.drop(code.args), _revs)
+                    }
+                    is OperatorCode -> {
+                        // Operators with fixed number of operands not eligible for optimization.
+                        Pair(IneligibleFrame() + frames.drop(code.args), revs)
+                    }
+                    else ->
+                        Pair(frames, revs)
+                }
+            Triple(pos + 1, _frames, _revs)
+        }
+        return revise(codes, revs)
     }
+
+    // These represent what to do with stack frames when combining dynamic operators.
+    private interface Frame
+    private class EligibleFrame(val op: String, val pos: Int, val code: DynamicOperatorCode) : Frame
+    private class IneligibleFrame : Frame
+
+    // A convenient prepend operation to a list of frames.
+    private operator fun Frame.plus(frames: List<Frame>) = listOf(this) + frames
 
     /**
      * An optimization that flattens identical operations adjacent to each other in the
