@@ -68,7 +68,7 @@ private class BasicEvaluator(val resolver: (String) -> Double?) : Evaluator {
     }
 }
 
-private val operators: Map<KClass<out OperatorCode>, (Double, Double) -> Double> = mapOf(
+val operators: Map<KClass<out OperatorCode>, (Double, Double) -> Double> = mapOf(
     AddCode::class to { l, r -> l + r },
     SubtractCode::class to { l, r -> l - r },
     MultiplyCode::class to { l, r -> l * r },

@@ -219,8 +219,7 @@ private class BasicOptimizer : Optimizer {
      * modified to reflect the combined number of arguments.
      */
     private fun flattenDynamicOperators(codes: List<Code>): List<Code> {
-        val initial: Triple<Int, DynamicOperatorCode?, Map<Int, Code>> = Triple(0, null, emptyMap())
-        val (_, _, revs) = codes.fold(initial) {
+            val (_, _, revs) = codes.fold(Triple(0, null as DynamicOperatorCode?, emptyMap<Int, Code>())) {
             (pos, prior, revs), code ->
                 val (p, r) = when {
                     code is DynamicOperatorCode && code.isAssociative -> when (prior?.op) {
@@ -297,9 +296,66 @@ private class BasicOptimizer : Optimizer {
      * `push` instruction containing the computed value.
      */
     private fun evaluateLiteralExpressions(codes: List<Code>): List<Code> {
-        // TODO
-        return codes
+
+        fun analyze(pos: Int, codes: List<Code>, stack: List<Value>): Map<Int, Code> {
+            fun inspect(code: OperatorCode): Pair<Map<Int, Code>, List<Value>> {
+                // Extract only those arguments representing literal values.
+                val nums = stack.take(code.args).reversed().filterIsInstance<NumberValue>()
+
+                // Revisions can only be applied if the operator is commutative and more than one argument
+                // is a literal, or for any operator if all arguments are literals.
+                val revs = if ((nums.size > 1 && code.isCommutative) || nums.size == code.args) {
+
+                    // Precompute value by applying operator function to literals in left-to-right order.
+                    val value = nums.map { it.value }.reduce(operators.getValue(code::class))
+
+                    // Replace all but last `push` instruction with `nop`.
+                    val rs = nums.dropLast(1).fold(emptyMap<Int, Code>()) {
+                        r, num -> r + (num.pos to NopCode())
+                    }
+
+                    // Eliminate operation if entire expression is composed of literals, otherwise modify
+                    // operation to reflect reduction in arguments.
+                    rs + (nums.last().pos to PushCode(value)) +
+                        when {
+                            nums.size == code.args -> pos to NopCode()
+                            else -> pos to operatorCtors.getValue(code::class)(code.args - nums.size + 1)
+                        }
+                } else
+                    emptyMap<Int, Code>()
+
+                // Arbitrary value is always pushed after dropping operator arguments since all operators
+                // push result of its computation.
+                return Pair(revs, ArbitraryValue() + stack.drop(code.args))
+            }
+
+            return when (val code = codes.firstOrNull()) {
+                is DeclareSymbolCode -> analyze(pos + 1, codes.drop(1), stack)
+                is PushSymbolCode -> analyze(pos + 1, codes.drop(1), ArbitraryValue() + stack)
+                is PushCode -> analyze(pos + 1, codes.drop(1), NumberValue(code.value, pos) + stack)
+                is OperatorCode -> {
+                    val (revs, s) = inspect(code)
+                    if (revs.size == 0) analyze(pos + 1, codes.drop(1), s) else revs
+                }
+                null -> emptyMap()
+                else -> analyze(pos + 1, codes.drop(1), stack)
+            }
+        }
+
+        tailrec fun evaluate(codes: List<Code>): List<Code> {
+            val revs = analyze(0, codes, emptyList())
+            return if (revs.isEmpty()) codes else evaluate(revise(codes, revs))
+        }
+
+        return evaluate(codes)
     }
+
+    // These represent real and arbitrary values on the evaluation stack during literal optimization.
+    private interface Value
+    private class NumberValue(val value: Double, val pos: Int) : Value
+    private class ArbitraryValue : Value
+
+    private operator fun Value.plus(tail: List<Value>) = listOf(this) + tail
 
     private fun revise(codes: List<Code>, revs: Map<Int, Code>): List<Code> {
         return if (revs.isEmpty())
