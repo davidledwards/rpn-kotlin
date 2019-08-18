@@ -19,7 +19,7 @@
  * A recursive-descent parser that transforms a sequence of tokens into a syntax tree.
  * 
  * Grammar:
- * {{{
+ * ```
  * p0 ::= <p2> <p1>
  * p1 ::= '+' <p2> <p1>
  *    ::= '-' <p2> <p1>
@@ -37,7 +37,7 @@
  * p6 ::= '(' <p0> ')'
  *    ::= <symbol>
  *    ::= <number>
- * }}}
+ * ```
  */
 interface Parser : (Sequence<Token>) -> AST {
     companion object {

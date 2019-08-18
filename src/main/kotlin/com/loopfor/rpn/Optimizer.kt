@@ -69,28 +69,28 @@ private class BasicOptimizer : Optimizer {
      * 
      * The parser generates an AST that first evaluates `x + y`, then evaluates the result of
      * that expression and `z`. The corresponding bytecode follows:
-     * {{{
+     * ```
      * push x
      * push y
      * add 2
      * push z
      * add 2
-     * }}}
+     * ```
      * 
      * The `add 2` instruction tells the interpreter to pop `2` elements from the evaluation
      * stack, compute the sum, and push the result onto the stack. Since the `add` instruction
      * can operate on any number of arguments, both `add` operations can be combined into a
      * single instruction:
-     * {{{
+     * ```
      * push x
      * push y
      * push z
      * add 3
-     * }}}
+     * ```
      * 
      * A slightly more complicated example illustrates the same principle. Consider the input,
      * `a + (b * c) + d`, and the corresponding bytecode:
-     * {{{
+     * ```
      * push a
      * push b
      * push c
@@ -98,7 +98,7 @@ private class BasicOptimizer : Optimizer {
      * add 2
      * push d
      * add 2
-     * }}}
+     * ```
      * 
      * Similar to the first scenario, both `add` operations can be combined even though the
      * intervening expression `b * c` exists. Note that adjacency of instructions is not
@@ -167,21 +167,21 @@ private class BasicOptimizer : Optimizer {
      * An optimization that flattens identical operations adjacent to each other in the
      * instruction sequence.
      * 
-     * This optimization is similar to [[combineDynamicOperators]] in that operations are
+     * This optimization is similar to [combineDynamicOperators] in that operations are
      * essentially combined, but instead it looks for special cases in which identical operations
      * occur in adjacent frames on the evaluation stack.
      * 
      * Consider the input, `x * (y * z)`, and the corresponding bytecode:
-     * {{{
+     * ```
      * push x
      * push y
      * push z
      * mul 2
      * mul 2
-     * }}}
+     * ```
      * 
      * Note that both `mul` instructions occur in adjacent positions. At first glance, it may
-     * appear as though [[combineDynamicOperators]] would eliminate one of the operations, but
+     * appear as though [combineDynamicOperators] would eliminate one of the operations, but
      * each occurs at a different frame on the evaluation stack.
      * 
      * The intuition behind this optimization is that the first `mul 2` would push its result
@@ -194,7 +194,7 @@ private class BasicOptimizer : Optimizer {
      * those operators with the associative property, i.e. evaluation can be left-to-right or
      * right-to-left. This becomes more clear with another example: `a * (b * (c * d))`.
      * The original instruction sequence follows:
-     * {{{
+     * ```
      * push a
      * push b
      * push c
@@ -202,17 +202,17 @@ private class BasicOptimizer : Optimizer {
      * mul 2
      * mul 2
      * mul 2
-     * }}}
+     * ```
      * 
      * In essence, the parentheses are being removed and evaluated in a left-to-right manner
      * by eliminating all but the last `mul` instruction:
-     * {{{
+     * ```
      * push a
      * push b
      * push c
      * push d
      * mul 4
-     * }}}
+     * ```
      * 
      * The algorithm works by stepping through each associative operator instruction, finding
      * adjacent identical pairs, and eliminating all but the final instruction, which is then
@@ -251,7 +251,7 @@ private class BasicOptimizer : Optimizer {
      * 
      * Consider the input, `x + 1 + y + 2`, which produces the following sequence of
      * unoptimized instructions:
-     * {{{
+     * ```
      * push x
      * push 1
      * add 2
@@ -259,16 +259,16 @@ private class BasicOptimizer : Optimizer {
      * add 2
      * push 2
      * add 2
-     * }}}
+     * ```
      * 
-     * Applying the [[combineDynamicOperators]] optimization produces the following:
-     * {{{
+     * Applying the [combineDynamicOperators] optimization produces the following:
+     * ```
      * push x
      * push 1
      * push y
      * push 2
      * add 4
-     * }}}
+     * ```
      * 
      * In either case, there is still opportunity to further optimize. Had the original input
      * been written as `x + y + 1 + 2`, it becomes more clear that `1 + 2` could be replaced
@@ -277,12 +277,12 @@ private class BasicOptimizer : Optimizer {
      * 
      * In the latter optimized case above, applying this optimization reduces the instruction
      * sequence to the following:
-     * {{{
+     * ```
      * push x
      * push y
      * push 3
      * add 3
-     * }}}
+     * ```
      * 
      * The algorithm works by simulating execution of the instruction sequence using an evaluation
      * stack, though recording only literal values. As operations are encountered, the optimizer

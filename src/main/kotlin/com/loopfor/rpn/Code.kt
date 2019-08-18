@@ -19,7 +19,7 @@ package com.loopfor.rpn
  * Represents a bytecode instruction generated from a syntax tree.
  * 
  * Recognized instructions:
- * {{{
+ * ```
  * sym <symbol>
  * pushsym <symbol>
  * push <number>
@@ -32,7 +32,7 @@ package com.loopfor.rpn
  * mod
  * pow
  * nop
- * }}}
+ * ```
  */
 sealed class Code(val op: String) {
     abstract val repr: String

@@ -19,7 +19,7 @@ package com.loopfor.rpn
  * Represents a token recognized in the input stream.
  * 
  * Recognized tokens defined as regular expressions:
- * {{{
+ * ```
  * Plus = +
  * Minus = -
  * Star = *
@@ -33,7 +33,7 @@ package com.loopfor.rpn
  * Symbol = [A-Za-z]+
  * Number = ([0-9]+)|([0-9]+\.[0-9]+)
  * EOS = <end of stream>
- * }}}
+ * ```
  */
 sealed class Token(val lexeme: String) {
     override fun toString(): String = "Token($lexeme)"
