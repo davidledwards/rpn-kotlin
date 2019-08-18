@@ -16,11 +16,15 @@
 package com.loopfor.rpn
 
 fun main(args: Array<String>) {
-    Interpeter.main(args)
+    try {
+        Interpeter.main(args)
+    } catch (e: Exception) {
+        println(e.message)
+    }
 }
 
 object Interpeter {
-    fun main(args: Array<String>) = try {
+    fun main(args: Array<String>) {
         val ins = InputSequence(System.`in`)
         when (val arg = args.firstOrNull()) {
             "-?" -> {
@@ -63,7 +67,5 @@ object Interpeter {
                 }
             }
         }
-    } catch (e: Exception) {
-        println(e.message)
     }
 }

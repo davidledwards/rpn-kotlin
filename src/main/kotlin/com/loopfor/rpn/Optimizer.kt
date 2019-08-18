@@ -296,7 +296,6 @@ private class BasicOptimizer : Optimizer {
      * `push` instruction containing the computed value.
      */
     private fun evaluateLiteralExpressions(codes: List<Code>): List<Code> {
-
         fun analyze(pos: Int, codes: List<Code>, stack: List<Value>): Map<Int, Code> {
             fun inspect(code: OperatorCode): Pair<Map<Int, Code>, List<Value>> {
                 // Extract only those arguments representing literal values.

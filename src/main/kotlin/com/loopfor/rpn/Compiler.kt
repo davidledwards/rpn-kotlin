@@ -16,11 +16,15 @@
 package com.loopfor.rpn
 
 fun main(args: Array<String>) {
-    Compiler.main(args)
+    try {
+        Compiler.main(args)
+    } catch (e: Exception) {
+        println(e.message)
+    }
 }
 
 object Compiler {
-    fun main(args: Array<String>) = try {
+    fun main(args: Array<String>) {
         val ins = InputSequence(System.`in`)
         when (val arg = args.firstOrNull()) {
             "-?" -> {
@@ -49,7 +53,5 @@ object Compiler {
             else ->
                 println("$arg: unrecognized option")
         }
-    } catch (e: Exception) {
-        println(e.message)
     }
 }
