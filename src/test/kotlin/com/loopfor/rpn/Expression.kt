@@ -22,7 +22,7 @@ import kotlin.random.nextInt
 object Expression {
     private val r = Random(currentTimeMillis())
 
-    fun generate(ws: () -> String): Pair<String, List<Token>> {
+    fun generate(ws: () -> String = { Space.space }): Pair<String, List<Token>> {
         fun expression(operand: () -> List<Token>): List<Token> {
             return (0 until r.nextInt(0 until 4)).fold(operand()) {
                 e, _ -> e + Operator.generate() + operand()
