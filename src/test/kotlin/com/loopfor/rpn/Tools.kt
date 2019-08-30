@@ -115,22 +115,13 @@ object Tools {
      * sequence.
      */
     fun generatorTests(count: Int) {
-        tailrec fun emit(codes: List<Code>) {
-            if (codes.size > 0) {
-                print("${tab(4)}${codes.first()}")
-                val rest = codes.drop(1)
-                if (rest.size == 0) print("))") else println(",")
-                emit(rest)
-            }
-        }
-
         println("${tab(1)}private val tests = listOf<Pair<String, List<Code>>>(")
         for (n in 1..count) {
             val (expr, _) = Expression.generate()
             println("""${tab(2)}Pair("$expr",""")
             println("${tab(3)}listOf(")
             val codes = Generator.create(Parser.create(Lexer.create(expr)))
-            emit(codes)
+            emit(codes, 4)
             if (n < count) println(",") else println(")")
         }
     }
@@ -147,10 +138,29 @@ object Tools {
      * should be removed from the set before use in unit tests.
      */
     fun optimizerTests(count: Int) {
+        println("${tab(1)}private val tests = listOf<Pair<Double, List<Code>>>(")
+        for (n in 1..count) {
+            val (expr, _) = Expression.generate()
+            val codes = Generator.create(Parser.create(Lexer.create(expr)))
+            val result = Evaluator.create(codes.asSequence()) { hash(it) }
+            println("""${tab(2)}Pair($result,""")
+            println("${tab(3)}listOf(")
+            emit(codes, 4)
+            if (n < count) println(",") else println(")")
+        }
     }
 
     fun hash(name: String): Double {
         return name.fold(0.0) { h, c -> h + c.toDouble() / 100.0 } / 10.0
+    }
+
+    private tailrec fun emit(codes: List<Code>, depth: Int) {
+        if (codes.size > 0) {
+            print("${tab(depth)}${codes.first()}")
+            val rest = codes.drop(1)
+            if (rest.size == 0) print("))") else println(",")
+            emit(rest, depth)
+        }
     }
 
     private fun tab(n: Int) = " ".repeat(n * 4)
