@@ -61,6 +61,8 @@ abstract class DynamicOperatorCode(op: String, args: Int) : OperatorCode(op, arg
 class DeclareSymbolCode(val name: String) : Code("sym") {
     override val repr = "$op $name"
 
+    override fun toString() = """DeclareSymbolCode("$name")"""
+
     companion object {
         private val pattern = """\s*sym\s+([a-zA-Z]+)\s*""".toRegex()
 
@@ -77,6 +79,8 @@ class DeclareSymbolCode(val name: String) : Code("sym") {
  */
 class PushSymbolCode(val name: String) : Code("pushsym") {
     override val repr = "$op $name"
+
+    override fun toString() = """PushSymbolCode("$name")"""
 
     companion object {
         private val pattern = """\s*pushsym\s+([a-zA-Z]+)\s*""".toRegex()
@@ -97,6 +101,8 @@ class PushCode(val value: Double) : Code("push") {
         String.format("%.10f", value).reversed().dropWhile { it == '0' }.dropWhile { it == '.' }.reversed()
 
     override val repr = "$op $canonical"
+
+    override fun toString() = """PushCode($value)"""
 
     companion object {
         private val pattern = """\s*push\s+(-?\d+|-?\d+\.\d+)\s*""".toRegex()
@@ -121,6 +127,8 @@ class AddCode(args: Int) : DynamicOperatorCode("add", args) {
     override val isAssociative = true
     override val isCommutative = true
 
+    override fun toString() = """AddCode($args)"""
+
     companion object {
         private val pattern = """\s*add\s+(\d+)\s*""".toRegex()
 
@@ -139,6 +147,8 @@ class AddCode(args: Int) : DynamicOperatorCode("add", args) {
 class SubtractCode(args: Int) : DynamicOperatorCode("sub", args) {
     override val isAssociative = false
     override val isCommutative = false
+
+    override fun toString() = """SubtractCode($args)"""
 
     companion object {
         private val pattern = """\s*sub\s+(\d+)\s*""".toRegex()
@@ -159,6 +169,8 @@ class MultiplyCode(args: Int) : DynamicOperatorCode("mul", args) {
     override val isAssociative = true
     override val isCommutative = true
 
+    override fun toString() = """MultiplyCode($args)"""
+
     companion object {
         private val pattern = """\s*mul\s+(\d+)\s*""".toRegex()
 
@@ -177,6 +189,8 @@ class MultiplyCode(args: Int) : DynamicOperatorCode("mul", args) {
 class DivideCode(args: Int) : DynamicOperatorCode("div", args) {
     override val isAssociative = false
     override val isCommutative = false
+
+    override fun toString() = """DivideCode($args)"""
 
     companion object {
         private val pattern = """\s*div\s+(\d+)\s*""".toRegex()
@@ -197,6 +211,8 @@ class MinCode(args: Int) : DynamicOperatorCode("min", args) {
     override val isAssociative = true
     override val isCommutative = true
 
+    override fun toString() = """MinCode($args)"""
+
     companion object {
         private val pattern = """\s*min\s+(\d+)\s*""".toRegex()
 
@@ -215,6 +231,8 @@ class MinCode(args: Int) : DynamicOperatorCode("min", args) {
 class MaxCode(args: Int) : DynamicOperatorCode("max", args) {
     override val isAssociative = true
     override val isCommutative = true
+
+    override fun toString() = """MaxCode($args)"""
 
     companion object {
         private val pattern = """\s*max\s+(\d+)\s*""".toRegex()
@@ -235,6 +253,8 @@ class ModuloCode : FixedOperatorCode("mod", 2) {
     override val isAssociative = false
     override val isCommutative = false
 
+    override fun toString() = "ModuloCode()"
+
     companion object {
         private val pattern = """\s*mod\s*""".toRegex()
 
@@ -251,6 +271,8 @@ class PowerCode : FixedOperatorCode("pow", 2) {
     override val isAssociative = false
     override val isCommutative = false
 
+    override fun toString() = "PowerCode()"
+
     companion object {
         private val pattern = """\s*pow\s*""".toRegex()
 
@@ -263,6 +285,8 @@ class PowerCode : FixedOperatorCode("pow", 2) {
  * An instruction that has no effect.
  */
 class NopCode : BasicCode("nop") {
+    override fun toString() = "NopCode()"
+
     companion object {
         private val pattern = """\s*nop\s*""".toRegex()
 

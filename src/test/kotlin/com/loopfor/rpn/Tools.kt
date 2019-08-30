@@ -115,6 +115,24 @@ object Tools {
      * sequence.
      */
     fun generatorTests(count: Int) {
+        tailrec fun emit(codes: List<Code>) {
+            if (codes.size > 0) {
+                print("${tab(4)}${codes.first()}")
+                val rest = codes.drop(1)
+                if (rest.size == 0) print("))") else println(",")
+                emit(rest)
+            }
+        }
+
+        println("${tab(1)}private val tests = listOf<Pair<String, List<Code>>>(")
+        for (n in 1..count) {
+            val (expr, _) = Expression.generate()
+            println("""${tab(2)}Pair("$expr",""")
+            println("${tab(3)}listOf(")
+            val codes = Generator.create(Parser.create(Lexer.create(expr)))
+            emit(codes)
+            if (n < count) println(",") else println(")")
+        }
     }
 
     /**
