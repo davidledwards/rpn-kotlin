@@ -44,8 +44,7 @@ class LexerTest {
 
         for (expr in tests) {
             try {
-                val ts = Lexer.create(expr)
-                for (t in ts) {}
+                Lexer.create(expr).count()
                 fail<Unit>(expr)
             } catch (_: Exception) {
             }
