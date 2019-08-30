@@ -16,9 +16,39 @@
 package com.loopfor.rpn
 
 fun main(args: Array<String>) {
-    Tools.parserTests(100)
-    Tools.generatorTests(100)
-    Tools.optimizerTests(100)
+    fun count(): Int {
+        val arg = args.elementAtOrNull(1)
+        return try {
+            arg?.toInt() ?: 100
+        } catch (_: NumberFormatException) {
+            println("${arg}: malformed COUNT")
+            0
+        }
+    }
+
+    when (args.elementAtOrNull(0)) {
+        "-p" -> {
+            val n = count()
+            if (n > 0) Tools.parserTests(n)
+        }
+        "-g" -> {
+            val n = count()
+            if (n > 0) Tools.generatorTests(n)
+        }
+        "-o" -> {
+            val n = count()
+            if (n > 0) Tools.optimizerTests(n)
+        }
+        else -> {
+            println("usage: ${Tools::class.qualifiedName} action")
+            println("  Generate random expressions for inclusion in unit tests.")
+            println()
+            println("actions")
+            println("  -p COUNT  generate parser tests")
+            println("  -g COUNT  generate generator tests")
+            println("  -o COUNT  generate optimizer tests")
+        }
+    }
 }
 
 /**
