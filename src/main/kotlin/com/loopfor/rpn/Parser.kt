@@ -39,12 +39,10 @@
  *    ::= <number>
  * ```
  */
-interface Parser : (Sequence<Token>) -> AST {
-    companion object {
-        fun create(): Parser = BasicParser()
-        fun create(tokens: Sequence<Token>): AST = create()(tokens)
-    }
-}
+interface Parser : (Sequence<Token>) -> AST
+
+fun Parser(): Parser = BasicParser()
+fun Parser(tokens: Sequence<Token>): AST = Parser()(tokens)
 
 private class BasicParser : Parser {
     override fun invoke(ins: Sequence<Token>): AST {

@@ -19,12 +19,10 @@ package com.loopfor.rpn
  * An instruction loader that transforms a sequence of characters into a sequence of
  * instructions.
  */
-interface Loader : (Sequence<Char>) -> Sequence<Code> {
-    companion object {
-        fun create(): Loader = BasicLoader()
-        fun create(ins: Sequence<Char>): Sequence<Code> = create()(ins)
-    }
-}
+interface Loader : (Sequence<Char>) -> Sequence<Code>
+
+fun Loader(): Loader = BasicLoader()
+fun Loader(ins: Sequence<Char>): Sequence<Code> = Loader()(ins)
 
 private class BasicLoader : Loader {
     override fun invoke(ins: Sequence<Char>): Sequence<Code> {

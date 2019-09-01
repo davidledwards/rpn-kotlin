@@ -21,13 +21,11 @@ package com.loopfor.rpn
  * Tokens must either be delimited by one or more whitespace characters, or be clearly
  * distinguishable from each other if not separated by whitespace.
  */
-interface Lexer : (Sequence<Char>) -> Sequence<Token> {
-    companion object {
-        fun create(): Lexer = BasicLexer()
-        fun create(ins: Sequence<Char>): Sequence<Token> = create()(ins)
-        fun create(ins: String): Sequence<Token> = create()(ins.asSequence())
-    }
-}
+interface Lexer : (Sequence<Char>) -> Sequence<Token>
+
+fun Lexer(): Lexer = BasicLexer()
+fun Lexer(ins: Sequence<Char>): Sequence<Token> = Lexer()(ins)
+fun Lexer(ins: String): Sequence<Token> = Lexer()(ins.asSequence())
 
 private class BasicLexer : Lexer {
     override fun invoke(ins: Sequence<Char>): Sequence<Token> {

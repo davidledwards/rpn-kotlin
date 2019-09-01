@@ -18,12 +18,10 @@ package com.loopfor.rpn
 /**
  * An emitter that transforms a list of instructions into a sequence of strings.
  */
-interface Emitter : (List<Code>) -> Sequence<String> {
-    companion object {
-        fun create(): Emitter = BasicEmitter()
-        fun create(codes: List<Code>): Sequence<String> = create()(codes)
-    }
-}
+interface Emitter : (List<Code>) -> Sequence<String>
+
+fun Emitter(): Emitter = BasicEmitter()
+fun Emitter(codes: List<Code>): Sequence<String> = Emitter()(codes)
 
 private class BasicEmitter : Emitter {
     override fun invoke(codes: List<Code>): Sequence<String> {

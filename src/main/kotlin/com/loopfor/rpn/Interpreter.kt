@@ -34,7 +34,7 @@ object Interpeter {
                 println("  -s  print symbols")
             }
             "-s" -> {
-                val codes = Loader.create(ins)
+                val codes = Loader(ins)
                 Codes.symbols(codes).forEach { println(it) }
             }
             else -> {
@@ -60,7 +60,7 @@ object Interpeter {
                         }
                     }
                     val syms = bind(args.toList(), emptyMap())
-                    val result = Evaluator.create(Loader.create(ins)) { syms.get(it) }
+                    val result = Evaluator(Loader(ins)) { syms.get(it) }
                     println(result)
                 } else {
                     println("$arg: unrecognized option")

@@ -35,19 +35,19 @@ object Compiler {
                 println("  -o  optimize")
             }
             "-t" -> {
-                val tokens = Lexer.create(ins)
+                val tokens = Lexer(ins)
                 tokens.forEach { println(it) }
             }
             "-p" -> {
-                val ast = Parser.create(Lexer.create(ins))
+                val ast = Parser(Lexer(ins))
                 println(ast.format())
             }
             "-o" -> {
-                val lines = Emitter.create(Optimizer.create(Generator.create(Parser.create(Lexer.create(ins)))))
+                val lines = Emitter(Optimizer(Generator(Parser(Lexer(ins)))))
                 lines.forEach { println(it) }
             }
             null -> {
-                val lines = Emitter.create(Generator.create(Parser.create(Lexer.create(ins))))
+                val lines = Emitter(Generator(Parser(Lexer(ins))))
                 lines.forEach { println(it) }
             }
             else ->

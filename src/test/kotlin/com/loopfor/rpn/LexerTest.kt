@@ -24,7 +24,7 @@ class LexerTest {
         (1..100).forEach {
             val (expr, tokens) = Expression.generate()
             try {
-                val ts = Lexer.create(expr)
+                val ts = Lexer(expr)
                 for ((x, y) in ts.zip(tokens.asSequence()))
                     assertEquals(x.lexeme, y.lexeme)
             } catch (e: Exception) {
@@ -44,7 +44,7 @@ class LexerTest {
 
         for (expr in tests) {
             try {
-                Lexer.create(expr).count()
+                Lexer(expr).count()
                 fail<Unit>(expr)
             } catch (_: Exception) {
             }

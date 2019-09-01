@@ -23,7 +23,7 @@ class ParserTest {
     fun `valid randomized expressions`() {
         for ((expr, ast) in tests) {
             try {
-                val a = Parser.create(Lexer.create(expr))
+                val a = Parser(Lexer(expr))
                 assertEquals(a, ast)
             } catch (e: Exception) {
                 fail<Unit>(e.message)
@@ -51,7 +51,7 @@ class ParserTest {
 
         for (expr in tests) {
             try {
-                Parser.create(Lexer.create(expr))
+                Parser(Lexer(expr))
                 fail<Unit>(expr)
             } catch (_: Exception) {
             }

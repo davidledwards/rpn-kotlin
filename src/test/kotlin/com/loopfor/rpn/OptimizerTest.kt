@@ -26,7 +26,7 @@ class OptimizerTest {
     fun `optimizations`() {
         for ((result, unopt) in tests) {
             try {
-                val r = Evaluator.create(Optimizer.create(unopt).asSequence()) { Tools.hash(it) }
+                val r = Evaluator(Optimizer(unopt).asSequence()) { Tools.hash(it) }
                 assert(r > (result - Epsilon) && r < (result + Epsilon))
             } catch (e: Exception) {
                 fail<Unit>(e.message)

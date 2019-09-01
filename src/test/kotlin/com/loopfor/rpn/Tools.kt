@@ -70,7 +70,7 @@ object Tools {
         (1..count).forEach { n ->
             val (expr, _) = Expression.generate()
             println("""${tab(2)}Pair("$expr",""")
-            val ast = Parser.create(Lexer.create(expr))
+            val ast = Parser(Lexer(expr))
 
             fun emit(ast: AST, depth: Int) {
                 fun printAST(name: String, l: AST, r: AST) {
@@ -120,7 +120,7 @@ object Tools {
             val (expr, _) = Expression.generate()
             println("""${tab(2)}Pair("$expr",""")
             println("${tab(3)}listOf(")
-            val codes = Generator.create(Parser.create(Lexer.create(expr)))
+            val codes = Generator(Parser(Lexer(expr)))
             emit(codes, 4)
             if (n < count) println(",") else println(")")
         }
@@ -141,8 +141,8 @@ object Tools {
         println("${tab(1)}private val tests = listOf<Pair<Double, List<Code>>>(")
         for (n in 1..count) {
             val (expr, _) = Expression.generate()
-            val codes = Generator.create(Parser.create(Lexer.create(expr)))
-            val result = Evaluator.create(codes.asSequence()) { hash(it) }
+            val codes = Generator(Parser(Lexer(expr)))
+            val result = Evaluator(codes.asSequence()) { hash(it) }
             println("""${tab(2)}Pair($result,""")
             println("${tab(3)}listOf(")
             emit(codes, 4)

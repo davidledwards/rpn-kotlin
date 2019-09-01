@@ -23,7 +23,7 @@ class GeneratorTest {
     fun `valid expressions`() {
         for ((expr, codes) in tests) {
             try {
-                val cs = Generator.create(Parser.create(Lexer.create(expr)))
+                val cs = Generator(Parser(Lexer(expr)))
                 for ((x, y) in cs.zip(codes))
                     assertEquals(x.op, y.op)
             } catch (e: Exception) {

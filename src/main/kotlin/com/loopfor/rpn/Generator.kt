@@ -20,12 +20,10 @@ package com.loopfor.rpn
  * 
  * The instruction sequence should be considered unoptimized.
  */
-interface Generator : (AST) -> List<Code> {
-    companion object {
-        fun create(): Generator = BasicGenerator()
-        fun create(ast: AST): List<Code> = create()(ast)
-    }
-}
+interface Generator : (AST) -> List<Code>
+
+fun Generator(): Generator = BasicGenerator()
+fun Generator(ast: AST): List<Code> = Generator()(ast)
 
 // Represents list of instruction codes and symbol names.
 private typealias State = Pair<List<Code>, Set<String>>

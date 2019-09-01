@@ -21,16 +21,10 @@ import kotlin.reflect.KClass
  * An optimizer that transforms a list of instructions into another list of
  * instructions.
  */
-interface Optimizer : (List<Code>) -> List<Code> {
-    companion object {
-        fun create(): Optimizer = BasicOptimizer()
-        fun create(codes: List<Code>): List<Code> = create()(codes)
+interface Optimizer : (List<Code>) -> List<Code>
 
-        val disabled : Optimizer = object : Optimizer {
-            override fun invoke(codes: List<Code>): List<Code> = codes
-        }
-    }
-}
+fun Optimizer(): Optimizer = BasicOptimizer()
+fun Optimizer(codes: List<Code>): List<Code> = Optimizer()(codes)
 
 private class BasicOptimizer : Optimizer {
     override fun invoke(codes: List<Code>): List<Code> {

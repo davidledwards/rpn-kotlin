@@ -23,12 +23,10 @@ import kotlin.reflect.KClass
 /**
  * An evaluator that computes the result of an instruction sequence.
  */
-interface Evaluator : (Sequence<Code>) -> Double {
-    companion object {
-        fun create(resolver: (String) -> Double?): Evaluator = BasicEvaluator(resolver)
-        fun create(codes: Sequence<Code>, resolver: (String) -> Double?): Double = create(resolver)(codes)
-    }
-}
+interface Evaluator : (Sequence<Code>) -> Double
+
+fun Evaluator(resolver: (String) -> Double?): Evaluator = BasicEvaluator(resolver)
+fun Evaluator(codes: Sequence<Code>, resolver: (String) -> Double?): Double = Evaluator(resolver)(codes)
 
 private class BasicEvaluator(val resolver: (String) -> Double?) : Evaluator {
     override fun invoke(codes: Sequence<Code>): Double {
