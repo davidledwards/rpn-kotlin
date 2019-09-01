@@ -1,5 +1,25 @@
 # RPN Compiler and Interpreter (Kotlin version)
-A Kotlin implementation of the RPN compiler and interpreter. See the original [RPN project]() for documentation.
+A Kotlin implementation of the RPN compiler and interpreter. See the original [RPN project](https://github.com/davidledwards/rpn) for documentation.
+
+## Comments
+TODO
+
+## Building
+This project is built using [Gradle](https://gradle.org/). After installing `gradle`, clone the repository and issue the command `gradle ???` in the root directory of the project. This produces a redistributable assembly in the form of a single file, either `target/rpn-<version>.tar.gz` or `target/rpn-<version>.zip`.
+
+Unpacking the assembly produces a directory structure with the following format:
+```
+rpn-<version>/
++ bin/
+  + rpnc
+  + rpnc.bat
+  + rpn
+  + rpn.bat
++ lib/
+  ...
+```
+
+For convenience, you might place `rpn-<version>/bin/rpnc` and `rpn-<version>/bin/rpn` in your `PATH` or create an alias.
 
 # License
 Copyright 2019 David Edwards
