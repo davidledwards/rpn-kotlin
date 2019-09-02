@@ -1,0 +1,19 @@
+#!/bin/sh
+
+__JAVA=$(which java)
+if [[ -z "$__JAVA" ]]; then
+    if [[ -z "$JAVA_HOME" ]]; then
+        echo "no java runtime found; put java in PATH or define JAVA_HOME"
+        exit 1
+    else
+        __JAVA=$JAVA_HOME/bin/java
+        if [[ ! (-f "$__JAVA" && -x "$__JAVA") ]]; then
+            echo "$__JAVA: not found; verify JAVA_HOME environment variable"
+            exit 1
+        fi
+    fi
+fi
+
+__BASE_DIR=$(cd $(dirname $0); pwd)
+__CLASSPATH=$(echo $__BASE_DIR/lib/*.jar | sed "s/ /:/g")
+$__JAVA $JAVA_OPTS -classpath $__CLASSPATH com.loopfor.rpn.CompilerKt "$@"
