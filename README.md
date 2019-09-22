@@ -5,7 +5,7 @@ A Kotlin implementation of the RPN compiler and interpreter. See the original [R
 TODO
 
 ## Building
-This project is built using [Gradle](https://gradle.org/). After installing `gradle`, clone the repository and issue the command `gradle package` in the root directory of the project. This produces a redistributable assembly in the form of a single file, either `build/distributions/rpn-kotlin-<version>.tar.gz` or `build/distributions/rpn-kotlin-<version>.zip`.
+This project is built using [Gradle](https://gradle.org/). After installing `gradle`, clone the repository and issue the command `gradle package` in the root directory of the project. This produces a redistributable assembly under the subdirectory `build/distributions` in the form of a single file, either `rpn-kotlin-<version>.tar.gz` or `rpn-kotlin-<version>.zip`.
 
 Unpacking the assembly produces a directory structure with the following format:
 ```
