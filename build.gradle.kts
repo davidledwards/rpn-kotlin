@@ -43,12 +43,12 @@ tasks.register("packagePrepare") {
 
 tasks.register<Copy>("packageCopyScripts") {
     from("$rootDir/src/main/shell")
-    into("$buildDir/package/${project.name}-$version")
+    into("$buildDir/package/rpn-$version")
 }
 
 tasks.register<Copy>("packageCopyLibs") {
     dependsOn(configurations.runtimeClasspath)
     from(file("$buildDir/libs"))
     from(configurations.runtimeClasspath)
-    into("$buildDir/package/${project.name}-$version/lib")
+    into("$buildDir/package/rpn-$version/lib")
 }
