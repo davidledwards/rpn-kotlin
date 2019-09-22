@@ -27,7 +27,7 @@ object Interpeter {
     fun main(args: Array<String>) {
         val ins = InputSequence(System.`in`)
         when (val arg = args.firstOrNull()) {
-            "-?" -> {
+            "-help" -> {
                 println("usage: rpn [option] [sym val]...")
                 println("  Evaluate instructions from stdin and print result to stdout.")
                 println("  Binds optional sequence of sym/val pairs prior to evaluation.")

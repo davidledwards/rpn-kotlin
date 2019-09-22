@@ -27,7 +27,7 @@ object Compiler {
     fun main(args: Array<String>) {
         val ins = InputSequence(System.`in`)
         when (val arg = args.firstOrNull()) {
-            "-?" -> {
+            "-help" -> {
                 println("usage: rpnc [options]")
                 println("  Compile expression from stdin and emit instructions to stdout.")
                 println("  -t  tokenize only")
