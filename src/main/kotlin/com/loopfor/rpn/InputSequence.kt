@@ -30,16 +30,24 @@ class InputSequence(ins: InputStream) : Sequence<Char> {
 
     override operator fun iterator() = object : Iterator<Char> {
         init {
+            // Reading the first character must wait until the iterator is created, otherwise creation of
+            // the sequence may cause the program to prematurely block depending on the type of input stream.
             if (c == null) c = reader.read()
         }
 
+        // Iteration actually happens against the buffer due to odd behavior of sequences as implemented
+        // by the standard library. Note that use of a buffer defeats the purpose of using a sequence.
         val iter = acc.iterator()
 
         override operator fun hasNext(): Boolean {
+            // Look at the string buffer iterator first, then when exhausted, look at the next character
+            // read from the input stream.
             return iter.hasNext() || c != -1
         }
 
         override operator fun next(): Char {
+            // Return next character in buffer iterator if one exists, otherwise append next character from
+            // input stream to buffer.
             return if (iter.hasNext())
                 iter.next()
             else {
