@@ -10,7 +10,9 @@ A key and distinguishing feature present in Scala, but notably absent in Kotlin,
 
 Perhaps one of the more challenging issues moving from Scala to Kotlin was the inconsistent behavior of `Sequence`. Scala provides a `Stream` interface as part of its standard library, which represents a lazy, and possibly infinite, sequence. Kotlin provides something similar through the `Sequence` interface, although I came to realize that the behavior was not consistent with expectations. I would argue that it violates the [principle of least surprise](https://en.wikipedia.org/wiki/Principle_of_least_astonishment), but of course, am happy to entertain opposing views.
 
-In particular, implementations of `Sequence` may constrain themselves to be iterated only once. The unfortunate side effect is that one cannot reason absolutely about the behavior of `Sequence`.
+In particular, implementations of `Sequence` may constrain themselves to be iterated only once. The unfortunate side effect is that one cannot reason absolutely about the behavior of `Sequence`. The following is an excerpt from the official Kotlin [documentation](https://kotlinlang.org/docs/sequences.html#sequence-operations):
+
+> Sequences can be iterated multiple times; however some sequence implementations might constrain themselves to be iterated only once. That is mentioned specifically in their documentation.
 
 To illustrate, the following throws an exception when the underlying `Sequence` is constrained to a single iteration.
 
